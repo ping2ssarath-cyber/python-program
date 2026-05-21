@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathLab Pro — Interactive Math Universe</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* ── CSS Variables ── */
+:root {
+  --bg: #03000f;
+  --surface: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --cyan: #00f5ff;
+  --pink: #ff2d78;
+  --gold: #ffd700;
+  --green: #00ff88;
+  --orange: #ff6b35;
+  --purple: #b44dff;
+  --white: #e8eaf6;
+  --muted: #7986cb;
+  --font-display: 'Orbitron', monospace;
+  --font-body: 'Exo 2', sans-serif;
+  --glow-cyan: 0 0 20px rgba(0,245,255,0.5), 0 0 60px rgba(0,245,255,0.2);
+  --glow-pink: 0 0 20px rgba(255,45,120,0.5), 0 0 60px rgba(255,45,120,0.2);
+  --glow-gold: 0 0 20px rgba(255,215,0,0.5), 0 0 60px rgba(255,215,0,0.2);
+  --glow-green: 0 0 20px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2);
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Animated Background Canvas ── */
+#bg-canvas {
+  position: fixed; inset: 0;
+  z-index: 0; pointer-events: none;
+}
+
+/* ── Floating Particles ── */
+.particles { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.particle {
+  position:absolute; border-radius:50%;
+  animation: float-up linear infinite;
+  opacity:0;
+}
+@keyframes float-up {
+  0%   { transform:translateY(100vh) rotate(0deg); opacity:0; }
+  10%  { opacity:1; }
+  90%  { opacity:0.5; }
+  100% { transform:translateY(-10vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Layout ── */
+.wrapper { position:relative; z-index:1; }
+
+/* ── Header ── */
+header {
+  text-align:center;
+  padding: 60px 20px 40px;
+  position: relative;
+}
+.logo-ring {
+  width: 100px; height: 100px;
+  border: 3px solid var(--cyan);
+  border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  margin: 0 auto 24px;
+  position: relative;
+  box-shadow: var(--glow-cyan);
+  animation: spin-ring 8s linear infinite;
+}
+@keyframes spin-ring {
+  0%   { box-shadow: var(--glow-cyan); }
+  33%  { box-shadow: var(--glow-pink); border-color: var(--pink); }
+  66%  { box-shadow: var(--glow-gold); border-color: var(--gold); }
+  100% { box-shadow: var(--glow-cyan); border-color: var(--cyan); }
+}
+.logo-ring::before {
+  content:'∑';
+  font-size: 42px;
+  font-family: var(--font-display);
+  background: linear-gradient(135deg, var(--cyan), var(--pink), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.logo-ring::after {
+  content:'';
+  position:absolute; inset:-8px;
+  border:1px solid rgba(0,245,255,0.2);
+  border-radius:50%;
+  animation: orbit 3s linear infinite;
+}
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--pink) 50%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(0,245,255,0.4));
+  animation: title-glow 4s ease-in-out infinite alternate;
+}
+@keyframes title-glow {
+  from { filter: drop-shadow(0 0 20px rgba(0,245,255,0.3)); }
+  to   { filter: drop-shadow(0 0 50px rgba(255,45,120,0.5)); }
+}
+.subtitle {
+  color: var(--muted);
+  margin-top: 10px;
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── Nav Grid ── */
+.nav-grid {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  justify-content: center;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+.nav-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 10px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  transition: all 0.3s;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+.nav-btn::before {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(135deg, var(--cyan), var(--pink));
+  opacity:0; transition:opacity 0.3s;
+  border-radius: 30px;
+}
+.nav-btn:hover { transform:translateY(-2px); border-color: transparent; }
+.nav-btn:hover::before { opacity:1; }
+.nav-btn span { position:relative; z-index:1; }
+
+/* ── Sections Grid ── */
+.sections {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  backdrop-filter: blur(10px);
+}
+.card::before {
+  content:'';
+  position:absolute; top:-2px; left:-2px; right:-2px; bottom:-2px;
+  border-radius:21px;
+  background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+  z-index:-1; opacity:0;
+  transition: opacity 0.4s;
+}
+.card:hover { transform:translateY(-6px); }
+.card:hover::before { opacity:1; }
+.card:hover .card-inner { box-shadow: none; }
+
+.card[data-color="cyan"]   { --accent-a: var(--cyan); --accent-b: var(--purple); }
+.card[data-color="pink"]   { --accent-a: var(--pink); --accent-b: var(--orange); }
+.card[data-color="gold"]   { --accent-a: var(--gold); --accent-b: var(--green); }
+.card[data-color="green"]  { --accent-a: var(--green); --accent-b: var(--cyan); }
+.card[data-color="orange"] { --accent-a: var(--orange); --accent-b: var(--pink); }
+.card[data-color="purple"] { --accent-a: var(--purple); --accent-b: var(--cyan); }
+
+.card-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 22px;
+}
+.card-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 24px;
+  background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent-a);
+}
+.card-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ── Form Elements ── */
+.input-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.input-group { flex:1; min-width:100px; }
+label {
+  display:block;
+  font-size:0.72rem;
+  letter-spacing:0.1em;
+  color: var(--muted);
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+input[type="number"], input[type="text"], select {
+  width:100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--white);
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+input:focus, select:focus {
+  border-color: var(--accent-a, var(--cyan));
+  box-shadow: 0 0 0 3px rgba(0,245,255,0.15);
+}
+select option { background: #0a0a1a; }
+
+/* ── Buttons ── */
+.btn {
+  width:100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--accent-a, var(--cyan)), var(--accent-b, var(--purple)));
+  color: #000;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.btn::after {
+  content:'';
+  position:absolute; top:50%; left:50%;
+  width:0; height:0;
+  background:rgba(255,255,255,0.3);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition: width 0.5s, height 0.5s, opacity 0.5s;
+  opacity:0;
+}
+.btn:active::after { width:300px; height:300px; opacity:0; }
+.btn:hover { transform:scale(1.02); box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+
+/* ── Result Box ── */
+.result-box {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  min-height: 60px;
+  display: none;
+  animation: result-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+@keyframes result-appear {
+  from { opacity:0; transform:scale(0.9) translateY(10px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.result-box.show { display:block; }
+.result-box::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--accent-a, var(--cyan)), var(--accent-b, var(--pink)));
+}
+.result-main {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.result-detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.result-big {
+  font-size: 2rem;
+  font-family: var(--font-display);
+  font-weight: 900;
+}
+
+/* ── Table Output ── */
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+.table-row {
+  display:flex; align-items:center; justify-content:center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  font-size: 0.82rem;
+  font-family: var(--font-display);
+  animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes pop-in {
+  from { opacity:0; transform:scale(0.5); }
+  to   { opacity:1; transform:scale(1); }
+}
+
+/* ── Fibonacci viz ── */
+.fib-bars {
+  display:flex; align-items:flex-end; gap:4px;
+  height:80px; margin-top:10px;
+}
+.fib-bar {
+  flex:1; border-radius:4px 4px 0 0;
+  min-height:4px;
+  transition:height 0.5s ease;
+  animation: bar-rise 0.5s ease both;
+}
+@keyframes bar-rise {
+  from { transform:scaleY(0); transform-origin:bottom; }
+  to   { transform:scaleY(1); transform-origin:bottom; }
+}
+
+/* ── Score bars ── */
+.score-bar-wrap { margin: 6px 0; }
+.score-bar-label { font-size:0.75rem; display:flex; justify-content:space-between; margin-bottom:3px; }
+.score-bar-track { background:rgba(255,255,255,0.07); border-radius:20px; height:8px; overflow:hidden; }
+.score-bar-fill {
+  height:100%; border-radius:20px;
+  background: linear-gradient(90deg, var(--accent-a, var(--green)), var(--accent-b, var(--cyan)));
+  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── BMI Gauge ── */
+.bmi-gauge { text-align:center; padding:10px 0; }
+.gauge-svg { width:100%; max-width:200px; }
+
+/* ── Temp converter ── */
+.temp-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px; }
+.temp-chip {
+  background:rgba(255,255,255,0.06);
+  border-radius:10px; padding:12px 6px;
+  text-align:center;
+}
+.temp-chip .unit { font-size:0.7rem; color:var(--muted); margin-bottom:4px; }
+.temp-chip .val  { font-family:var(--font-display); font-size:1rem; font-weight:700; }
+
+/* ── Procedure Modal ── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.3s;
+}
+.modal-overlay.open { opacity:1; pointer-events:auto; }
+.modal {
+  background: #0a0a1a;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 36px;
+  max-width: 700px;
+  width:100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform:scale(0.9);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.modal-overlay.open .modal { transform:scale(1); }
+.modal h2 {
+  font-family:var(--font-display);
+  background: linear-gradient(135deg,var(--cyan),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:20px; font-size:1.4rem;
+}
+.modal h3 { color:var(--cyan); font-size:0.9rem; margin:18px 0 8px; font-family:var(--font-display); letter-spacing:0.05em; }
+.modal p  { color:var(--muted); font-size:0.88rem; line-height:1.7; }
+.modal ul { color:var(--muted); font-size:0.88rem; line-height:1.8; padding-left:18px; }
+.modal li::marker { color:var(--cyan); }
+.modal-close {
+  float:right; background:none; border:1px solid var(--border);
+  color:var(--white); border-radius:8px; padding:6px 14px;
+  cursor:pointer; font-family:var(--font-body);
+  transition:all 0.2s;
+}
+.modal-close:hover { background:var(--pink); border-color:var(--pink); }
+.code-block {
+  background:rgba(0,0,0,0.5);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+  margin:10px 0;
+  font-family:monospace;
+  font-size:0.82rem;
+  color:#a0e6ff;
+  overflow-x:auto;
+  line-height:1.7;
+}
+
+/* ── Section Full Width ── */
+.full-width { grid-column: 1 / -1; }
+
+/* ── Confetti ── */
+.confetti-container { position:fixed; inset:0; pointer-events:none; z-index:999; overflow:hidden; }
+.confetti-piece {
+  position:absolute;
+  width:10px; height:10px;
+  animation:confetti-fall 3s ease-in forwards;
+}
+@keyframes confetti-fall {
+  0%   { transform:translateY(-20px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* ── Help FAB ── */
+.fab {
+  position:fixed; bottom:30px; right:30px; z-index:100;
+  width:56px; height:56px; border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border:none; cursor:pointer;
+  font-size:24px; color:#000;
+  box-shadow:var(--glow-cyan);
+  transition:all 0.3s;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display);
+  font-weight:900;
+}
+.fab:hover { transform:scale(1.1) rotate(15deg); }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--purple); border-radius:3px; }
+
+/* ── Responsive ── */
+@media (max-width:600px) {
+  .sections { grid-template-columns:1fr; }
+  h1 { font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated BG -->
+<canvas id="bg-canvas"></canvas>
+<div class="particles" id="particles"></div>
+<div class="confetti-container" id="confetti"></div>
+
+<!-- Help FAB -->
+<button class="fab" onclick="openProcedure()">?</button>
+
+<!-- Procedure Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    <h2>📖 How to Use MathLab Pro</h2>
+
+    <h3>🚀 Getting Started</h3>
+    <p>This is a Flask-powered web app. Each card represents a mathematical program. Simply enter the required values and click the Calculate button to get instant results.</p>
+
+    <h3>🛠️ Running Locally (Flask Setup)</h3>
+    <div class="code-block">
+# 1. Install Python 3.8+<br>
+# 2. Install Flask<br>
+pip install flask<br><br>
+# 3. Run the app<br>
+python app.py<br><br>
+# 4. Open browser at<br>
+http://localhost:5000
+    </div>
+
+    <h3>📁 Project Structure</h3>
+    <div class="code-block">
+mathlab/<br>
+├── app.py           ← Flask backend<br>
+├── templates/<br>
+│   └── index.html   ← This page<br>
+└── static/          ← CSS/JS assets
+    </div>
+
+    <h3>🔢 Available Programs</h3>
+    <ul>
+      <li><strong>Odd/Even Checker</strong> — Determines if a number is odd or even using modulo</li>
+      <li><strong>Grade Calculator</strong> — Converts marks to letter grades + GPA</li>
+      <li><strong>Multiplication Table</strong> — Generates table up to any limit</li>
+      <li><strong>Pass/Fail Checker</strong> — Multi-subject pass/fail with averages</li>
+      <li><strong>Leap Year Detector</strong> — Checks divisibility rules for leap years</li>
+      <li><strong>Factorial Calculator</strong> — Computes n! with step display</li>
+      <li><strong>Prime Number Checker</strong> — Primality test using square root method</li>
+      <li><strong>Fibonacci Sequence</strong> — Generates n terms with bar visualization</li>
+      <li><strong>BMI Calculator</strong> — Body Mass Index with health category</li>
+      <li><strong>Simple Interest</strong> — SI = (P × R × T) / 100</li>
+      <li><strong>Quadratic Solver</strong> — Finds real or complex roots via discriminant</li>
+      <li><strong>Temperature Converter</strong> — Converts between °C, °F, and K</li>
+    </ul>
+
+    <h3>💡 API Endpoints</h3>
+    <div class="code-block">
+POST /api/odd_even      → { number }<br>
+POST /api/grade         → { marks }<br>
+POST /api/table         → { number, limit }<br>
+POST /api/pass_fail     → { subjects: [s1,s2...] }<br>
+POST /api/leap_year     → { year }<br>
+POST /api/factorial     → { number }<br>
+POST /api/prime         → { number }<br>
+POST /api/fibonacci     → { count }<br>
+POST /api/bmi           → { weight, height }<br>
+POST /api/simple_interest → { principal, rate, time }<br>
+POST /api/quadratic     → { a, b, c }<br>
+POST /api/temperature   → { value, unit }
+    </div>
+
+    <h3>🎨 Tech Stack</h3>
+    <ul>
+      <li>Backend: Python 3 + Flask</li>
+      <li>Frontend: HTML5, CSS3, Vanilla JS</li>
+      <li>Fonts: Orbitron + Exo 2 (Google Fonts)</li>
+      <li>API: JSON REST via fetch()</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Main Wrapper -->
+<div class="wrapper">
+  <header>
+    <div class="logo-ring"></div>
+    <h1>MathLab Pro</h1>
+    <p class="subtitle">Interactive Mathematical Universe · Powered by Python Flask</p>
+  </header>
+
+  <!-- Nav -->
+  <nav class="nav-grid">
+    <a class="nav-btn" href="#odd-even"><span>⚡ Odd / Even</span></a>
+    <a class="nav-btn" href="#grade"><span>🏆 Grade Calc</span></a>
+    <a class="nav-btn" href="#table"><span>📊 Table</span></a>
+    <a class="nav-btn" href="#passfail"><span>✅ Pass / Fail</span></a>
+    <a class="nav-btn" href="#leap"><span>🌿 Leap Year</span></a>
+    <a class="nav-btn" href="#factorial"><span>∑ Factorial</span></a>
+    <a class="nav-btn" href="#prime"><span>✨ Prime</span></a>
+    <a class="nav-btn" href="#fib"><span>🌀 Fibonacci</span></a>
+    <a class="nav-btn" href="#bmi"><span>💪 BMI</span></a>
+    <a class="nav-btn" href="#si"><span>💰 Interest</span></a>
+    <a class="nav-btn" href="#quadratic"><span>📐 Quadratic</span></a>
+    <a class="nav-btn" href="#temp"><span>🌡️ Temperature</span></a>
+  </nav>
+
+  <!-- Sections -->
+  <main class="sections">
+
+    <!-- 1. ODD / EVEN -->
+    <div class="card" id="odd-even" data-color="cyan">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <div>
+          <div class="card-title">Odd / Even Checker</div>
+          <div class="card-desc">Detects number parity using modulo operation</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Enter any number</label>
+          <input type="number" id="oe-num" placeholder="e.g. 42" />
+        </div>
+      </div>
+      <button class="btn" onclick="calcOddEven()">⚡ Check Now</button>
+      <div class="result-box" id="oe-result"></div>
+    </div>
+
+    <!-- 2. GRADE -->
+    <div class="card" id="grade" data-color="gold">
+      <div class="card-header">
+        <div class="card-icon">🏆</div>
+        <div>
+          <div class="card-title">Grade Calculator</div>
+          <div class="card-desc">Converts marks to grade + GPA on a 4.0 scale</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Marks (0–100)</label>
+          <input type="number" id="grade-marks" placeholder="e.g. 87" min="0" max="100"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcGrade()">🏆 Get Grade</button>
+      <div class="result-box" id="grade-result"></div>
+    </div>
+
+    <!-- 3. TABLE -->
+    <div class="card" id="table" data-color="purple">
+      <div class="card-header">
+        <div class="card-icon">📊</div>
+        <div>
+          <div class="card-title">Multiplication Table</div>
+          <div class="card-desc">Generate full multiplication tables instantly</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Number</label>
+          <input type="number" id="table-num" placeholder="e.g. 7" />
+        </div>
+        <div class="input-group">
+          <label>Up to</label>
+          <input type="number" id="table-limit" placeholder="12" value="12" min="1" max="20"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcTable()">📊 Generate Table</button>
+      <div class="result-box" id="table-result"></div>
+    </div>
+
+    <!-- 4. PASS / FAIL -->
+    <div class="card" id="passfail" data-color="green">
+      <div class="card-header">
+        <div class="card-icon">✅</div>
+        <div>
+          <div class="card-title">Pass / Fail Checker</div>
+          <div class="card-desc">Multi-subject evaluation with score analysis</div>
+        </div>
+      </div>
+      <div class="input-row" style="flex-direction:column">
+        <label>Subject Scores (comma separated)</label>
+        <input type="text" id="pf-subjects" placeholder="e.g. 78, 45, 92, 38, 65" />
+      </div>
+      <button class="btn" onclick="calcPassFail()">✅ Evaluate</button>
+      <div class="result-box" id="pf-result"></div>
+    </div>
+
+    <!-- 5. LEAP YEAR -->
+    <div class="card" id="leap" data-color="green">
+      <div class="card-header">
+        <div class="card-icon">🌿</div>
+        <div>
+          <div class="card-title">Leap Year Detector</div>
+          <div class="card-desc">Divisibility rule: ÷4 but not ÷100, unless ÷400</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Enter Year</label>
+          <input type="number" id="leap-year" placeholder="e.g. 2024" />
+        </div>
+      </div>
+      <button class="btn" onclick="calcLeap()">🌿 Check Year</button>
+      <div class="result-box" id="leap-result"></div>
+    </div>
+
+    <!-- 6. FACTORIAL -->
+    <div class="card" id="factorial" data-color="pink">
+      <div class="card-header">
+        <div class="card-icon">∑</div>
+        <div>
+          <div class="card-title">Factorial Calculator</div>
+          <div class="card-desc">Computes n! = n × (n−1) × ... × 1</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Enter n (0–20)</label>
+          <input type="number" id="fact-num" placeholder="e.g. 7" min="0" max="20"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcFactorial()">∑ Compute!</button>
+      <div class="result-box" id="fact-result"></div>
+    </div>
+
+    <!-- 7. PRIME -->
+    <div class="card" id="prime" data-color="gold">
+      <div class="card-header">
+        <div class="card-icon">✨</div>
+        <div>
+          <div class="card-title">Prime Number Checker</div>
+          <div class="card-desc">Primality test using √n optimization</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Enter number</label>
+          <input type="number" id="prime-num" placeholder="e.g. 97" min="1"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcPrime()">✨ Check Prime</button>
+      <div class="result-box" id="prime-result"></div>
+    </div>
+
+    <!-- 8. FIBONACCI -->
+    <div class="card" id="fib" data-color="cyan">
+      <div class="card-header">
+        <div class="card-icon">🌀</div>
+        <div>
+          <div class="card-title">Fibonacci Sequence</div>
+          <div class="card-desc">Generates sequence with animated visualization</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Number of terms (max 30)</label>
+          <input type="number" id="fib-count" placeholder="e.g. 10" min="1" max="30"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcFib()">🌀 Generate</button>
+      <div class="result-box" id="fib-result"></div>
+    </div>
+
+    <!-- 9. BMI -->
+    <div class="card" id="bmi" data-color="orange">
+      <div class="card-header">
+        <div class="card-icon">💪</div>
+        <div>
+          <div class="card-title">BMI Calculator</div>
+          <div class="card-desc">Body Mass Index = weight(kg) / height²(m)</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Weight (kg)</label>
+          <input type="number" id="bmi-weight" placeholder="e.g. 70"/>
+        </div>
+        <div class="input-group">
+          <label>Height (cm)</label>
+          <input type="number" id="bmi-height" placeholder="e.g. 175"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcBMI()">💪 Calculate BMI</button>
+      <div class="result-box" id="bmi-result"></div>
+    </div>
+
+    <!-- 10. SIMPLE INTEREST -->
+    <div class="card" id="si" data-color="gold">
+      <div class="card-header">
+        <div class="card-icon">💰</div>
+        <div>
+          <div class="card-title">Simple Interest</div>
+          <div class="card-desc">SI = (P × R × T) / 100</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Principal (₹)</label>
+          <input type="number" id="si-p" placeholder="e.g. 10000"/>
+        </div>
+        <div class="input-group">
+          <label>Rate (%)</label>
+          <input type="number" id="si-r" placeholder="e.g. 8"/>
+        </div>
+        <div class="input-group">
+          <label>Time (years)</label>
+          <input type="number" id="si-t" placeholder="e.g. 3"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcSI()">💰 Calculate</button>
+      <div class="result-box" id="si-result"></div>
+    </div>
+
+    <!-- 11. QUADRATIC -->
+    <div class="card" id="quadratic" data-color="pink">
+      <div class="card-header">
+        <div class="card-icon">📐</div>
+        <div>
+          <div class="card-title">Quadratic Equation Solver</div>
+          <div class="card-desc">ax² + bx + c = 0 → roots via discriminant</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>a</label>
+          <input type="number" id="quad-a" placeholder="e.g. 1"/>
+        </div>
+        <div class="input-group">
+          <label>b</label>
+          <input type="number" id="quad-b" placeholder="e.g. -5"/>
+        </div>
+        <div class="input-group">
+          <label>c</label>
+          <input type="number" id="quad-c" placeholder="e.g. 6"/>
+        </div>
+      </div>
+      <button class="btn" onclick="calcQuad()">📐 Solve</button>
+      <div class="result-box" id="quad-result"></div>
+    </div>
+
+    <!-- 12. TEMPERATURE -->
+    <div class="card" id="temp" data-color="orange">
+      <div class="card-header">
+        <div class="card-icon">🌡️</div>
+        <div>
+          <div class="card-title">Temperature Converter</div>
+          <div class="card-desc">Convert between °Celsius, °Fahrenheit, Kelvin</div>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Temperature</label>
+          <input type="number" id="temp-val" placeholder="e.g. 100"/>
+        </div>
+        <div class="input-group">
+          <label>Unit</label>
+          <select id="temp-unit">
+            <option value="C">Celsius (°C)</option>
+            <option value="F">Fahrenheit (°F)</option>
+            <option value="K">Kelvin (K)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="calcTemp()">🌡️ Convert</button>
+      <div class="result-box" id="temp-result"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── Background Canvas Animation ──────────────────────────────────────────────
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+const stars = Array.from({length:120}, () => ({
+  x: Math.random()*canvas.width,
+  y: Math.random()*canvas.height,
+  r: Math.random()*1.5+0.3,
+  a: Math.random()*Math.PI*2,
+  speed: Math.random()*0.008+0.002,
+  color: ['#00f5ff','#ff2d78','#ffd700','#00ff88','#b44dff'][Math.floor(Math.random()*5)]
+}));
+
+const hexagons = Array.from({length:6}, (_,i) => ({
+  x: Math.random()*canvas.width,
+  y: Math.random()*canvas.height,
+  size: 60+Math.random()*80,
+  angle: 0,
+  speed: (Math.random()-0.5)*0.005,
+  color: ['#00f5ff','#ff2d78','#b44dff'][i%3]
+}));
+
+function drawHex(x,y,size,angle,color){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const a=i*Math.PI/3;
+    ctx[i?'lineTo':'moveTo'](size*Math.cos(a), size*Math.sin(a));
+  }
+  ctx.closePath();
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.06;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+let t=0;
+function animateBg(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  t+=0.01;
+  // Grid lines
+  ctx.globalAlpha=0.03;
+  ctx.strokeStyle='#00f5ff'; ctx.lineWidth=0.5;
+  for(let x=0;x<canvas.width;x+=60){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+  for(let y=0;y<canvas.height;y+=60){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+  // Stars
+  stars.forEach(s=>{
+    s.a+=s.speed;
+    const pulse=0.5+0.5*Math.sin(s.a);
+    ctx.globalAlpha=pulse*0.8;
+    ctx.fillStyle=s.color;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  // Hexagons
+  hexagons.forEach(h=>{
+    h.angle+=h.speed;
+    drawHex(h.x,h.y,h.size,h.angle,h.color);
+  });
+  requestAnimationFrame(animateBg);
+}
+animateBg();
+
+// ── Particles ────────────────────────────────────────────────────────────────
+const pContainer=document.getElementById('particles');
+const colors=['#00f5ff','#ff2d78','#ffd700','#00ff88','#b44dff','#ff6b35'];
+for(let i=0;i<30;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=3+Math.random()*6;
+  p.style.cssText=`
+    left:${Math.random()*100}%;
+    width:${size}px; height:${size}px;
+    background:${colors[Math.floor(Math.random()*colors.length)]};
+    animation-duration:${8+Math.random()*12}s;
+    animation-delay:${Math.random()*10}s;
+    filter:blur(${size>7?1:0}px);
+  `;
+  pContainer.appendChild(p);
+}
+
+// ── Confetti ─────────────────────────────────────────────────────────────────
+function spawnConfetti(){
+  const c=document.getElementById('confetti');
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');
+    p.className='confetti-piece';
+    const shapes=['●','■','▲','◆','★'];
+    p.textContent=shapes[Math.floor(Math.random()*shapes.length)];
+    p.style.cssText=`
+      left:${Math.random()*100}%; top:-20px;
+      color:${colors[Math.floor(Math.random()*colors.length)]};
+      font-size:${10+Math.random()*14}px;
+      animation-duration:${2+Math.random()*2}s;
+      animation-delay:${Math.random()*0.5}s;
+    `;
+    c.appendChild(p);
+    setTimeout(()=>p.remove(), 4000);
+  }
+}
+
+// ── API Helper ────────────────────────────────────────────────────────────────
+async function api(endpoint, data){
+  const res = await fetch(`/api/${endpoint}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  return res.json();
+}
+
+function showResult(id, html, color){
+  const box=document.getElementById(id);
+  box.style.borderTopColor = color || '#00f5ff';
+  box.innerHTML=html;
+  box.classList.remove('show');
+  void box.offsetWidth;
+  box.classList.add('show');
+}
+
+// ── 1. ODD / EVEN ─────────────────────────────────────────────────────────────
+async function calcOddEven(){
+  const n=document.getElementById('oe-num').value;
+  if(!n){ alert('Enter a number!'); return; }
+  const d=await api('odd_even',{number:n});
+  showResult('oe-result',`
+    <div class="result-big" style="color:${d.color}">${d.result}</div>
+    <div class="result-detail">${d.number} ÷ 2 = remainder ${d.number%2}</div>
+  `, d.color);
+}
+
+// ── 2. GRADE ──────────────────────────────────────────────────────────────────
+async function calcGrade(){
+  const m=document.getElementById('grade-marks').value;
+  if(!m){ alert('Enter marks!'); return; }
+  const d=await api('grade',{marks:m});
+  const pct=Math.min(d.marks,100);
+  showResult('grade-result',`
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="result-big" style="color:${d.color}">${d.grade}</div>
+      <div>
+        <div class="result-detail">GPA: <strong>${d.gpa}</strong></div>
+        <div class="result-detail">Status: <strong style="color:${d.color}">${d.status}</strong></div>
+      </div>
+    </div>
+    <div class="score-bar-wrap" style="margin-top:10px">
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:0%" data-w="${pct}%"></div></div>
+      <div class="score-bar-label"><span>0</span><span>${d.marks}/100</span></div>
+    </div>
+  `, d.color);
+  setTimeout(()=>{
+    document.querySelectorAll('.score-bar-fill').forEach(el=>el.style.width=el.dataset.w);
+  },50);
+  if(d.marks>=40) spawnConfetti();
+}
+
+// ── 3. TABLE ─────────────────────────────────────────────────────────────────
+async function calcTable(){
+  const n=document.getElementById('table-num').value;
+  const l=document.getElementById('table-limit').value||12;
+  if(!n){ alert('Enter a number!'); return; }
+  const d=await api('table',{number:n, limit:l});
+  const hues=['#00f5ff','#ff2d78','#ffd700','#00ff88','#b44dff','#ff6b35'];
+  let rows=d.rows.map((r,i)=>`
+    <div class="table-row" style="animation-delay:${i*0.05}s;border:1px solid ${hues[i%hues.length]}33;color:${hues[i%hues.length]}">
+      ${d.number} × ${r.i} = ${r.result}
+    </div>`).join('');
+  showResult('table-result',`
+    <div class="result-detail" style="margin-bottom:8px">Table of <strong style="color:#b44dff">${d.number}</strong></div>
+    <div class="table-grid">${rows}</div>
+  `,'#b44dff');
+}
+
+// ── 4. PASS/FAIL ─────────────────────────────────────────────────────────────
+async function calcPassFail(){
+  const raw=document.getElementById('pf-subjects').value;
+  if(!raw){ alert('Enter scores!'); return; }
+  const subjects=raw.split(',').map(s=>s.trim()).filter(Boolean);
+  const d=await api('pass_fail',{subjects});
+  const bars=d.scores.map((s,i)=>{
+    const c=s>=40?'#00ff88':'#ff4757';
+    return `<div class="score-bar-wrap">
+      <div class="score-bar-label"><span>Subject ${i+1}</span><span style="color:${c}">${s} — ${s>=40?'Pass ✅':'Fail ❌'}</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:0%;background:linear-gradient(90deg,${c},${c}88)" data-w="${Math.min(s,100)}%"></div></div>
+    </div>`;
+  }).join('');
+  showResult('pf-result',`
+    <div class="result-main" style="color:${d.color}">${d.overall}</div>
+    <div class="result-detail">Avg: ${d.average} | Passed: ${d.passed} | Failed: ${d.failed}</div>
+    <div style="margin-top:12px">${bars}</div>
+  `, d.color);
+  setTimeout(()=>document.querySelectorAll('.score-bar-fill').forEach(el=>el.style.width=el.dataset.w),50);
+  if(d.failed===0) spawnConfetti();
+}
+
+// ── 5. LEAP YEAR ─────────────────────────────────────────────────────────────
+async function calcLeap(){
+  const y=document.getElementById('leap-year').value;
+  if(!y){ alert('Enter a year!'); return; }
+  const d=await api('leap_year',{year:y});
+  showResult('leap-result',`
+    <div class="result-main" style="color:${d.color}">${d.result}</div>
+    <div class="result-detail">Days in ${d.year}: <strong>${d.days}</strong></div>
+    <div class="result-detail" style="margin-top:6px">
+      ${d.year}÷4=${d.year%4===0?'✅':'❌'} | 
+      ${d.year}÷100=${d.year%100===0?'✅':'❌'} | 
+      ${d.year}÷400=${d.year%400===0?'✅':'❌'}
+    </div>
+  `, d.color);
+  if(d.is_leap) spawnConfetti();
+}
+
+// ── 6. FACTORIAL ─────────────────────────────────────────────────────────────
+async function calcFactorial(){
+  const n=document.getElementById('fact-num').value;
+  if(n===''){ alert('Enter n!'); return; }
+  const d=await api('factorial',{number:n});
+  if(d.error){ showResult('fact-result',`<div class="result-main" style="color:#ff4757">${d.error}</div>`,'#ff4757'); return; }
+  showResult('fact-result',`
+    <div class="result-detail" style="margin-bottom:6px;word-break:break-all;font-size:0.76rem;color:#7986cb">${d.steps} = </div>
+    <div class="result-big" style="color:#ff2d78">${d.result.toLocaleString()}</div>
+  `,'#ff2d78');
+}
+
+// ── 7. PRIME ─────────────────────────────────────────────────────────────────
+async function calcPrime(){
+  const n=document.getElementById('prime-num').value;
+  if(!n){ alert('Enter a number!'); return; }
+  const d=await api('prime',{number:n});
+  showResult('prime-result',`
+    <div class="result-big" style="color:${d.color}">${d.result}</div>
+  `, d.color);
+  if(d.is_prime) spawnConfetti();
+}
+
+// ── 8. FIBONACCI ─────────────────────────────────────────────────────────────
+async function calcFib(){
+  const n=document.getElementById('fib-count').value;
+  if(!n){ alert('Enter count!'); return; }
+  const d=await api('fibonacci',{count:n});
+  if(d.error){ showResult('fib-result',`<div class="result-main" style="color:#ff4757">${d.error}</div>`,'#ff4757'); return; }
+  const max=Math.max(...d.sequence)||1;
+  const hues=['#00f5ff','#ff2d78','#ffd700','#00ff88','#b44dff','#ff6b35'];
+  const bars=d.sequence.map((v,i)=>{
+    const h=(v/max)*100;
+    return `<div class="fib-bar" style="background:${hues[i%hues.length]};height:${Math.max(h,4)}%;animation-delay:${i*0.05}s" title="${v}"></div>`;
+  }).join('');
+  showResult('fib-result',`
+    <div class="result-detail">${d.sequence.join(' → ')}</div>
+    <div class="fib-bars">${bars}</div>
+    <div class="result-detail" style="margin-top:6px">Last term: <strong style="color:#00f5ff">${d.last.toLocaleString()}</strong></div>
+  `,'#00f5ff');
+}
+
+// ── 9. BMI ───────────────────────────────────────────────────────────────────
+async function calcBMI(){
+  const w=document.getElementById('bmi-weight').value;
+  const h=document.getElementById('bmi-height').value;
+  if(!w||!h){ alert('Enter weight and height!'); return; }
+  const d=await api('bmi',{weight:w,height:h});
+  const pct=Math.min((d.bmi/40)*100,100);
+  showResult('bmi-result',`
+    <div class="result-big" style="color:${d.color}">${d.bmi}</div>
+    <div class="result-detail"><strong style="color:${d.color}">${d.category}</strong></div>
+    <div class="score-bar-wrap" style="margin-top:10px">
+      <div class="score-bar-label"><span>Underweight</span><span>Obese</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill" style="width:0%;background:linear-gradient(90deg,#00ff88,#ffd700,#ff4757)" data-w="${pct}%"></div></div>
+    </div>
+  `, d.color);
+  setTimeout(()=>document.querySelectorAll('.score-bar-fill').forEach(el=>el.style.width=el.dataset.w),50);
+}
+
+// ── 10. SIMPLE INTEREST ────────────────────────────────────────────────────────
+async function calcSI(){
+  const p=document.getElementById('si-p').value;
+  const r=document.getElementById('si-r').value;
+  const t=document.getElementById('si-t').value;
+  if(!p||!r||!t){ alert('Fill all fields!'); return; }
+  const d=await api('simple_interest',{principal:p,rate:r,time:t});
+  showResult('si-result',`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="text-align:center;background:rgba(255,215,0,0.1);border-radius:10px;padding:12px">
+        <div class="result-detail">Interest Earned</div>
+        <div style="font-family:var(--font-display);font-size:1.3rem;color:#ffd700">₹${d.si.toLocaleString()}</div>
+      </div>
+      <div style="text-align:center;background:rgba(0,255,136,0.1);border-radius:10px;padding:12px">
+        <div class="result-detail">Total Amount</div>
+        <div style="font-family:var(--font-display);font-size:1.3rem;color:#00ff88">₹${d.total.toLocaleString()}</div>
+      </div>
+    </div>
+    <div class="result-detail" style="margin-top:8px">P=₹${d.principal} | R=${d.rate}% | T=${d.time}yr</div>
+  `,'#ffd700');
+}
+
+// ── 11. QUADRATIC ─────────────────────────────────────────────────────────────
+async function calcQuad(){
+  const a=document.getElementById('quad-a').value;
+  const b=document.getElementById('quad-b').value;
+  const c=document.getElementById('quad-c').value;
+  if(a===''||b===''||c===''){ alert('Fill a, b, c!'); return; }
+  const d=await api('quadratic',{a,b,c});
+  showResult('quad-result',`
+    <div class="result-detail" style="margin-bottom:6px">Equation: <strong style="color:#ff2d78">${a}x² ${b>=0?'+':''}${b}x ${c>=0?'+':''}${c} = 0</strong></div>
+    <div class="result-main" style="color:${d.color}">${d.result}</div>
+    <div class="result-detail">Discriminant Δ = ${d.discriminant}</div>
+  `, d.color);
+}
+
+// ── 12. TEMPERATURE ────────────────────────────────────────────────────────────
+async function calcTemp(){
+  const v=document.getElementById('temp-val').value;
+  const u=document.getElementById('temp-unit').value;
+  if(v===''){ alert('Enter temperature!'); return; }
+  const d=await api('temperature',{value:v,unit:u});
+  const r=d.results;
+  showResult('temp-result',`
+    <div class="temp-grid">
+      <div class="temp-chip">
+        <div class="unit">Celsius</div>
+        <div class="val" style="color:#00f5ff">${r.C}°C</div>
+      </div>
+      <div class="temp-chip">
+        <div class="unit">Fahrenheit</div>
+        <div class="val" style="color:#ff6b35">${r.F}°F</div>
+      </div>
+      <div class="temp-chip">
+        <div class="unit">Kelvin</div>
+        <div class="val" style="color:#ffd700">${r.K}K</div>
+      </div>
+    </div>
+  `,'#ff6b35');
+}
+
+// ── Enter key support ─────────────────────────────────────────────────────────
+document.querySelectorAll('input').forEach(inp=>{
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      const card=inp.closest('.card');
+      if(card) card.querySelector('.btn')?.click();
+    }
+  });
+});
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openProcedure(){ document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target===e.currentTarget) closeModal(); });
+</script>
+</body>
+</html>
