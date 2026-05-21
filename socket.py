@@ -1,28 +1,32 @@
-
 import socket
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server_ip = input("Enter server system IP address: ")
+host = "0.0.0.0"
 port = 5000
 
-client.connect((server_ip, port))
+server.bind((host, port))
+server.listen(1)
 
-print("Connected to server")
+print("Waiting for connection...")
+conn, addr = server.accept()
+
+print("Connected with:", addr)
 
 while True:
-    message = input("You: ")
-    client.send(message.encode())
+    message = conn.recv(1024).decode()
 
     if message.lower() == "bye":
+        print("Client ended the chat")
         break
 
-    reply = client.recv(1024).decode()
+    print("Client:", message)
+
+    reply = input("You: ")
+    conn.send(reply.encode())
 
     if reply.lower() == "bye":
-        print("Server ended the chat")
         break
 
-    print("Server:", reply)
-
-client.close()
+conn.close()
+server.close()
