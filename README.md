@@ -1,255 +1,82 @@
 """
-Seeker - Python README Format
-Converted from Markdown README to Python documentation style.
+============================================================
+                         SEEKER
+============================================================
 
-Concept:
-Seeker is a proof-of-concept educational project demonstrating how websites
-can request browser geolocation permissions and collect device/browser metadata
-when users allow access.
+Educational Privacy & Security Awareness Project
 
-The project highlights privacy and security awareness by showing what
-information a website may gather from a visitor.
+============================================================
+ABOUT
+============================================================
+
+Seeker is an educational project that demonstrates how
+browser geolocation permissions and device information work.
 
 ============================================================
 FEATURES
 ============================================================
 
-Location Information (when permission is granted):
-- Longitude
-- Latitude
-- Accuracy
-- Altitude (not always available)
-- Direction (only available if the device is moving)
-- Speed (only available if the device is moving)
+Location Information:
+    • Latitude
+    • Longitude
+    • Accuracy
+    • Altitude
+    • Speed
+    • Direction
 
 Device Information:
-- Canvas fingerprint ID
-- Device model
-- Operating system
-- Platform
-- CPU cores
-- RAM information
-- Screen resolution
-- GPU information
-- Browser name and version
-- Public IP address
-- Local IP address
-- Local port
+    • Device Model
+    • Operating System
+    • Platform
+    • CPU Cores
+    • RAM Information
+    • Screen Resolution
+    • GPU Information
+    • Browser Name
+    • Browser Version
+    • Public IP Address
+    • Local IP Address
+    • Local Port
 
 ============================================================
 IMPORTANT NOTICE
 ============================================================
 
-This project is intended for:
-- Educational purposes
-- Security awareness
-- Privacy demonstrations
-- Learning how browser permissions work
+This project is intended only for:
+    • Educational purposes
+    • Privacy awareness
+    • Security demonstrations
 
-Do not use this project against individuals without explicit consent.
-Unauthorized collection of personal or location data may violate laws,
-privacy regulations, and ethical guidelines.
-
-============================================================
-HOW IT DIFFERS FROM IP GEOLOCATION
-============================================================
-
-Traditional IP geolocation:
-- Uses ISP information
-- Provides approximate area only
-- Often inaccurate
-
-Browser geolocation API:
-- Uses GPS hardware when available
-- More accurate on smartphones
-- Can achieve accuracy within ~30 meters
-- Falls back to IP-based estimation if GPS is unavailable
-
-Accuracy depends on:
-- Device hardware
-- Browser support
-- GPS calibration
-- Permission settings
+Do not use without permission.
 
 ============================================================
 AVAILABLE TEMPLATES
 ============================================================
 
-Templates included:
-- NearYou
-- Google Drive
-- WhatsApp
-- Telegram
-- Zoom
-- Google reCAPTCHA
-
-Users can create custom templates following the project's template guide.
+    • NearYou
+    • Google Drive
+    • WhatsApp
+    • Telegram
+    • Zoom
+    • Google reCAPTCHA
 
 ============================================================
 SUPPORTED PLATFORMS
 ============================================================
 
-Tested on:
-- Kali Linux
-- BlackArch Linux
-- Ubuntu
-- Fedora
-- Kali NetHunter
-- Termux
-- Parrot OS
-- macOS Monterey
-
-============================================================
-INSTALLATION
-============================================================
-
-Linux / Ubuntu / Fedora / Termux:
-
-    git clone https://github.com/thewhiteh4t/seeker.git
-    cd seeker/
-    chmod +x install.sh
-    ./install.sh
-
-BlackArch Linux:
-
-    sudo pacman -S seeker
-
-Docker:
-
-    docker pull thewhiteh4t/seeker
-
-macOS:
-
-    git clone https://github.com/thewhiteh4t/seeker.git
-    cd seeker/
-    python3 seeker.py
-
-============================================================
-NGROK SETUP
-============================================================
-
-Install ngrok:
-
-    brew install ngrok/ngrok/ngrok
-
-Run tunnel:
-
-    ngrok http 8080
-
-============================================================
-USAGE
-============================================================
-
-Help Menu:
-
-    python3 seeker.py -h
-
-Common Options:
-
-    -h, --help
-        Show help menu
-
-    -k, --kml
-        Export KML file
-
-    -p, --port
-        Specify web server port
-
-    -u, --update
-        Check for updates
-
-    -v, --version
-        Show version
-
-    -t, --template
-        Choose template
-
-    -d, --debugHTTP
-        Disable HTTPS redirection for testing
-
-============================================================
-ENVIRONMENT VARIABLES
-============================================================
-
-Supported variables:
-- DEBUG_HTTP
-- PORT
-- TEMPLATE
-- TITLE
-- REDIRECT
-- IMAGE
-- DESC
-- SITENAME
-- DISPLAY_URL
-- MEM_NUM
-- ONLINE_NUM
-- TELEGRAM
-- WEBHOOK
-
-============================================================
-USAGE EXAMPLES
-============================================================
-
-Start application:
-
-    python3 seeker.py
-
-Start ngrok tunnel:
-
-    ngrok http 8080
-
-Use custom port:
-
-    python3 seeker.py -p 1337
-
-Use template:
-
-    python3 seeker.py -t 1
-
-============================================================
-DOCKER USAGE
-============================================================
-
-Create network:
-
-    docker network create ngroknet
-
-Run container:
-
-    docker run --rm -it --net ngroknet --name seeker thewhiteh4t/seeker
-
-Run ngrok container:
-
-    docker run --rm -it --net ngroknet --name ngrok \
-        wernight/ngrok ngrok http seeker:8080
-
-============================================================
-LOCAL TUNNELS
-============================================================
-
-Alternative tunnel command:
-
-    ssh -R 80:localhost:8080 nokey@localhost.run
-
-============================================================
-DEMO
-============================================================
-
-Video Demo:
-https://odysee.com/@thewhiteh4t:2/seeker_v126_demo:e
+    • Kali Linux
+    • Ubuntu
+    • Fedora
+    • Termux
+    • Parrot OS
+    • macOS
 
 ============================================================
 OFFICIAL LINKS
 ============================================================
 
-GitHub Repository:
+GitHub:
 https://github.com/thewhiteh4t/seeker
-
-Blog:
-https://thewhiteh4t.github.io
-
-Twitter:
-https://twitter.com/thewhiteh4t
 
 Website:
 https://twc1rcle.com/
@@ -260,9 +87,56 @@ END OF DOCUMENT
 """
 
 
+def show_title():
+    print("======================================")
+    print("              SEEKER")
+    print("======================================")
+
+
+def show_features():
+    print("\nFEATURES")
+    print("--------------------------------------")
+    print("1. Browser Geolocation")
+    print("2. Device Information")
+    print("3. Browser Metadata")
+    print("4. Privacy Demonstration")
+
+
+def show_templates():
+    print("\nAVAILABLE TEMPLATES")
+    print("--------------------------------------")
+    print("1. NearYou")
+    print("2. Google Drive")
+    print("3. WhatsApp")
+    print("4. Telegram")
+    print("5. Zoom")
+
+
+def show_platforms():
+    print("\nSUPPORTED PLATFORMS")
+    print("--------------------------------------")
+    print("1. Kali Linux")
+    print("2. Ubuntu")
+    print("3. Fedora")
+    print("4. Termux")
+    print("5. macOS")
+
+
+def show_disclaimer():
+    print("\nDISCLAIMER")
+    print("--------------------------------------")
+    print("Use only for educational purposes.")
+    print("Do not use without user permission.")
+
+
 def main():
-    print("Seeker README loaded successfully.")
-    print("This file contains the converted Python-style README documentation.")
+    show_title()
+    show_features()
+    show_templates()
+    show_platforms()
+    show_disclaimer()
+
+    print("\nREADME Loaded Successfully.")
 
 
 if __name__ == "__main__":
