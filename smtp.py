@@ -10,11 +10,11 @@ from email.mime.multipart import MIMEMultipart
 smtp_server = "smtp.gmail.com"
 smtp_port = 587
 
-sender_email = "ping2sksarath@gmail.com"
-password = "bpcu lpfd arxn iumn"   # Use App Password for Gmail
+sender_email = "abcd@gmail.com"
+password = "bpcu lpfd ssss aaaa"   # Use App Password for Gmail
 
 # Receiver email
-receiver_email = "vikas07@gmail.com"
+receiver_email = "viaaaaaa@gmail.com"
 
 # Email content
 subject = "Test Email from Python SMTP"
