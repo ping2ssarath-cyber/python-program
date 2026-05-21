@@ -1,3 +1,4 @@
+
 contacts = {}
 
 name = input("Enter name: ")

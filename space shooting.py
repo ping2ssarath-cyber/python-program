@@ -67,3 +67,4 @@ while True:
     canvas.after(30)
 
 window.mainloop()
+
